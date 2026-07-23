@@ -1,4 +1,4 @@
-name: Build & Release
+name: NICS Controlled Strix Build & Release
 
 on:
   push:
