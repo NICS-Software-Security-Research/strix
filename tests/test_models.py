@@ -5,11 +5,13 @@ from __future__ import annotations
 import pytest
 from agents.model_settings import ModelSettings
 
+from strix.config import models
 from strix.config.models import (
     RECOMMENDED_MODEL_NAMES,
     is_recommended_or_frontier_model,
     request_timeout_extra_args,
 )
+from strix.config.settings import LlmSettings, Settings
 
 
 @pytest.mark.parametrize("model_name", RECOMMENDED_MODEL_NAMES)
@@ -27,6 +29,32 @@ def test_request_timeout_extra_args_survives_model_settings_json_dump() -> None:
     their tracing span; a non-JSON-serializable timeout fails every turn there."""
     settings = ModelSettings(extra_args=request_timeout_extra_args(300))
     assert settings.to_json_dict()["extra_args"] == {"timeout": 300}
+
+
+@pytest.mark.parametrize(
+    ("api_mode", "expected_api"),
+    [(None, "chat_completions"), ("responses", "responses")],
+)
+def test_custom_api_base_can_opt_in_to_responses(
+    api_mode: str | None, expected_api: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    selected_apis: list[str] = []
+    monkeypatch.setattr(models, "set_tracing_disabled", lambda _: None)
+    monkeypatch.setattr(models, "_configure_litellm_compatibility", lambda: None)
+    monkeypatch.setattr(models, "_configure_openrouter_attribution", lambda _: None)
+    monkeypatch.setattr(models, "_configure_litellm_default", lambda *_: None)
+    monkeypatch.setattr(models, "set_default_openai_api", selected_apis.append)
+
+    models.configure_sdk_model_defaults(
+        Settings(
+            llm=LlmSettings(
+                api_base="https://example.openai.azure.com/openai/v1/",
+                openai_api_mode=api_mode,
+            )
+        )
+    )
+
+    assert selected_apis == [expected_api]
 
 
 @pytest.mark.parametrize("value", [None, 0, -1])

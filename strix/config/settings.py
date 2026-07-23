@@ -9,6 +9,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 ReasoningEffort = Literal["none", "minimal", "low", "medium", "high", "xhigh"]
+OpenAIAPIMode = Literal["responses", "chat_completions"]
 
 _BASE_CONFIG = SettingsConfigDict(
     case_sensitive=False,
@@ -34,6 +35,10 @@ class LlmSettings(BaseSettings):
             "LITELLM_BASE_URL",
             "OLLAMA_API_BASE",
         ),
+    )
+    openai_api_mode: OpenAIAPIMode | None = Field(
+        default=None,
+        alias="STRIX_OPENAI_API_MODE",
     )
     reasoning_effort: ReasoningEffort = Field(default="high", alias="STRIX_REASONING_EFFORT")
     force_required_tool_choice: bool = Field(

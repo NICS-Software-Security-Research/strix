@@ -19,6 +19,10 @@ Configure Strix using environment variables or a config file.
   Custom API base URL. Also accepts `OPENAI_API_BASE`, `LITELLM_BASE_URL`, or `OLLAMA_API_BASE`.
 </ParamField>
 
+<ParamField path="STRIX_OPENAI_API_MODE" type="string">
+  Select `responses` to use the Responses API with a custom OpenAI-compatible base URL. When unset, custom base URLs continue to use `chat_completions`.
+</ParamField>
+
 <ParamField path="LLM_TIMEOUT" default="300" type="integer">
   Request timeout in seconds for LLM calls.
 </ParamField>

@@ -126,7 +126,7 @@ def configure_sdk_model_defaults(settings: Settings) -> None:
     if llm.api_base:
         os.environ["OPENAI_BASE_URL"] = llm.api_base
         _configure_litellm_default("api_base", llm.api_base)
-        set_default_openai_api("chat_completions")
+        set_default_openai_api(llm.openai_api_mode or "chat_completions")
     else:
         set_default_openai_api("responses")
 
